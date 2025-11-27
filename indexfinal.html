@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>JobLigan — Iligan City Exclusive Jobs</title>
+  <style>
+    :root{
+      --bg:#f7fafc; --card:#ffffff; --accent:#1d4ed8; --muted:#6b7280; --border:#e6e9ef;
+      --radius:12px; --gap:16px; --max:1100px;
+    }
+    *{box-sizing:border-box}
+    body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial; margin:0;background:var(--bg);color:#111}
+    a{color:var(--accent); text-decoration:none}
+    .container{max-width:var(--max);margin:0 auto;padding:20px}
+
+    /* Header */
+    header{background:var(--card);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:40}
+    .hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 20px}
+    .brand{font-weight:800;color:var(--accent);letter-spacing:-0.02em}
+    nav.desktop{display:none;gap:18px;color:var(--muted)}
+    .cta{display:flex;gap:8px}
+    .btn{padding:8px 12px;border-radius:10px;border:1px solid var(--border);background:transparent;cursor:pointer}
+    .primary{background:var(--accent);color:#fff;border:none}
+
+    /* Hero search */
+    .hero{background:var(--card);border-bottom:1px solid var(--border);padding:22px;margin-top:12px;border-radius:12px}
+    .hero-grid{display:grid;grid-template-columns:1fr 300px;gap:20px;align-items:center}
+    .title{font-size:20px;font-weight:700}
+    .subtitle{color:var(--muted);font-size:13px;margin-top:6px}
+    .search-row{display:flex;gap:10px;margin-top:14px}
+    .search-row input, .search-row select{padding:12px;border-radius:10px;border:1px solid var(--border);flex:1}
+    .search-row .loc{width:230px;flex:none}
+    .search-row button{padding:12px 18px;border-radius:10px;border:none;background:var(--accent);color:#fff;cursor:pointer}
+    .filters{background:var(--bg);padding:12px;border-radius:8px;margin-top:12px}
+
+    /* Layout */
+    main{display:grid;grid-template-columns:1fr 320px;gap:20px;margin-top:18px}
+    .jobs-list{display:flex;flex-direction:column;gap:14px}
+    .job{background:var(--card);padding:14px;border-radius:12px;border:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start}
+    .job .meta{color:var(--muted);font-size:13px;margin-top:6px}
+    .tags{margin-top:8px;display:flex;gap:8px;flex-wrap:wrap}
+    .tag{font-size:12px;padding:6px 8px;border-radius:999px;border:1px solid var(--border);color:var(--muted)}
+    .job-actions{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+    .job-actions .salary{font-weight:600}
+    .job-actions .small{font-size:12px;color:var(--muted)}
+    .actions{display:flex;gap:8px;margin-top:10px}
+    .actions .btn{padding:8px 10px}
+
+    /* Sidebar */
+    aside .card{background:var(--card);padding:14px;border-radius:12px;border:1px solid var(--border)}
+    .freelancer{display:flex;align-items:center;gap:10px;padding:8px 0}
+    .avatar{width:44px;height:44px;border-radius:50%;background:#eef2ff;display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:700}
+    .small{text-transform:uppercase;font-size:12px;color:var(--muted)}
+
+    /* Job Viewer */
+    .job-viewer{background:var(--card);padding:14px;border-radius:12px;border:1px solid var(--border);min-height:440px}
+    .slide{width:100%;height:260px;border-radius:10px;background:#e9f2ff;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--accent);font-size:18px;margin-bottom:16px;position:relative}
+    .slide-nav{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:8px}
+    .slide-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.5);cursor:pointer}
+    .slide-dot.active{background:white}
+    .contact{margin-top:12px;padding:10px;border-radius:10px;background:#fbfdff;border:1px solid #eef6ff}
+    form{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+    input[type=text], input[type=tel], textarea{padding:10px;border-radius:8px;border:1px solid var(--border)}
+    input[type=file]{padding:6px}
+    input[type=submit]{padding:10px;border-radius:8px;border:none;background:var(--accent);color:#fff;cursor:pointer}
+
+    /* Categories */
+    .categories{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+    .category-btn{padding:8px 16px;border-radius:8px;border:1px solid var(--border);background:transparent;cursor:pointer;font-size:14px}
+    .category-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+    /* Company Cards */
+    .company-card{background:var(--card);padding:16px;border-radius:12px;border:1px solid var(--border);margin-bottom:16px;cursor:pointer;transition:all 0.3s ease}
+    .company-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.1)}
+    .company-card.active{background:rgba(29,78,216,0.05);border-color:var(--accent)}
+    .company-header{display:flex;align-items:center;gap:12px;margin-bottom:0}
+    .company-logo{width:50px;height:50px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:18px}
+    .company-name{font-weight:600;font-size:18px}
+    .company-branches{font-size:13px;color:var(--muted)}
+    .branch-list{display:none;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)}
+    .branch-list.active{display:block}
+    .branch-location{font-weight:600;margin-bottom:12px;color:var(--accent);padding:8px 0;border-bottom:1px dashed var(--border)}
+    
+    /* Circular Images */
+    .image-gallery{display:flex;gap:16px;justify-content:center;margin:16px 0}
+    .circle-image{width:120px;height:120px;border-radius:50%;background:#e9f2ff;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--accent);font-size:14px;text-align:center;padding:10px;border:3px solid var(--accent)}
+
+    /* Application Links */
+    .application-links{display:flex;gap:12px;margin-top:16px;justify-content:center}
+    .application-link{background:var(--accent);color:white;padding:10px 16px;border-radius:8px;text-decoration:none;font-weight:600;text-align:center;flex:1;max-width:140px}
+    .application-link:hover{background:#1e40af}
+
+    /* Job Type Tabs */
+    .job-type-tabs{display:flex;gap:0;margin-bottom:20px;border-bottom:1px solid var(--border)}
+    .job-type-tab{padding:12px 24px;background:transparent;border:none;cursor:pointer;font-weight:600;border-bottom:3px solid transparent}
+    .job-type-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+    /* Footer */
+    footer{margin-top:28px;padding:20px 0;color:var(--muted);font-size:13px;text-align:center;border-top:1px solid var(--border)}
+    .disclaimer{font-size:12px;margin-top:10px;color:var(--muted)}
+
+    /* Responsive */
+    @media(min-width:768px){nav.desktop{display:flex}}
+    @media(max-width:900px){.hero-grid{grid-template-columns:1fr}main{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container hdr">
+      <div style="display:flex;align-items:center;gap:18px">
+        <div class="brand">JobLigan — Iligan City Exclusive</div>
+        <nav class="desktop">
+          <a href="#" class="job-type-tab active" data-type="physical">Physical Jobs</a>
+          <a href="#" class="job-type-tab" data-type="online">Online Jobs</a>
+          <a href="#">Employers</a>
+          <a href="#">Contact</a>
+        </nav>
+      </div>
+
+      <div class="cta">
+        <button class="btn">Sign in</button>
+        <button class="btn primary">Post a Job</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- TITLE HEADER -->
+    <header style="background:transparent;border:none;position:static;text-align:center;padding:20px 0">
+        <h1 style="margin:0;font-size:32px;color:var(--accent)">Job Hiring in Iligan City</h1>
+        <small style="font-size:16px;color:var(--muted)">Find your perfect job match in Iligan City</small>
+    </header>
+
+    <!-- JOB TYPE TABS -->
+    <div class="job-type-tabs">
+      <button class="job-type-tab active" data-type="physical">Physical Jobs</button>
+      <button class="job-type-tab" data-type="online">Online Jobs</button>
+    </div>
+
+    <section class="hero">
+      <div class="hero-grid">
+        <div>
+          <div class="title">Find physical jobs in Iligan City — exclusive local opportunities</div>
+          <div class="subtitle">Browse verified job listings from employers across Iligan City.</div>
+
+          <div class="search-row">
+            <input id="q" placeholder="Search jobs (e.g. Service Crew, Cashier)" />
+            <input id="loc" class="loc" placeholder="Iligan City only" readonly />
+            <button id="searchBtn">Search</button>
+          </div>
+
+          <div class="filters">
+            <label class="small">Popular Companies: <strong style="color:var(--accent)">Jollibee, McDonald's, Chowking</strong></label>
+            <div style="margin-top:8px;display:flex;gap:10px;flex-wrap:wrap">
+              <select id="category" style="padding:8px;border-radius:8px;border:1px solid var(--border)">
+                <option>All Categories</option>
+                <option>Food Service</option>
+                <option>Retail</option>
+                <option>BPO/Call Center</option>
+              </select>
+              <select id="salary" style="padding:8px;border-radius:8px;border:1px solid var(--border)">
+                <option>Any Salary</option>
+                <option>₱5k - ₱15k</option>
+                <option>₱15k - ₱40k</option>
+                <option>₱40k+</option>
+              </select>
+              <label style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="hiringOnly" /> Hiring only</label>
+            </div>
+          </div>
+        </div>
+
+        <aside>
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center"><strong>Quick filters</strong><a href="#">See all</a></div>
+            <div style="margin-top:10px;color:var(--muted);font-size:13px">Filter by company or location</div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <main>
+      <section>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <h2 style="margin:0">Physical Jobs by Company</h2>
+          <div id="resultsCount" style="color:var(--muted)">12 job positions</div>
+        </div>
+
+        <div class="categories">
+          <button class="category-btn active" data-category="all">All Companies</button>
+          <button class="category-btn" data-category="jollibee">Jollibee</button>
+          <button class="category-btn" data-category="mcdo">McDonald's</button>
+          <button class="category-btn" data-category="chowking">Chowking</button>
+          <button class="category-btn" data-category="localmart">LocalMart</button>
+        </div>
+
+        <!-- COMPANY CARDS -->
+        <div id="companyCards">
+          <!-- Company cards will be rendered here by JS -->
+        </div>
+      </section>
+
+      <aside style="display:flex;flex-direction:column;gap:14px">
+        <div class="job-viewer" id="jobViewer">
+          <div style="text-align:center;padding:40px 20px;color:var(--muted)">
+            <h3 style="margin-bottom:8px">Select a company to view details</h3>
+            <p>Click on any company card to view company information and available positions</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <strong>Quick Apply Links</strong>
+          </div>
+          <div style="margin-top:12px">
+            <div class="freelancer">
+              <div class="avatar">J</div>
+              <div>
+                <div style="font-weight:600">Jollibee Application</div>
+                <div style="font-size:12px;color:var(--muted)">Online form for all positions</div>
+              </div>
+              <div style="margin-left:auto">
+                <a href="https://forms.gle/jollibee-application" class="btn" target="_blank">Apply</a>
+              </div>
+            </div>
+            <div class="freelancer">
+              <div class="avatar">M</div>
+              <div>
+                <div style="font-weight:600">McDonald's Careers</div>
+                <div style="font-size:12px;color:var(--muted)">Submit your resume online</div>
+              </div>
+              <div style="margin-left:auto">
+                <a href="https://forms.gle/mcdonalds-careers" class="btn" target="_blank">Apply</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:var(--accent);color:#fff;padding:14px;border-radius:12px">
+          <strong>Employers: Post a Job</strong>
+          <div style="font-size:13px;color:rgba(255,255,255,0.9);margin-top:8px">List your job openings to reach qualified candidates in Iligan City.</div>
+          <div style="margin-top:10px"><button class="btn" style="background:#fff;color:var(--accent)">Post a job</button></div>
+        </div>
+      </aside>
+    </main>
+
+    <footer>
+      <div>© <span id="year"></span> JobLigan — Iligan City Exclusive Job Portal</div>
+      <div style="margin-top:8px">Contact: opportunities@jobligan.iligan.ph</div>
+      <div class="disclaimer">Disclaimer: This website is for educational purposes as part of a school project.</div>
+    </footer>
+  </div>
+
+  <script>
+    // Job data organized by company and location
+    const JOB_DATA = [
+      {
+        id: 'jollibee',
+        name: 'Jollibee',
+        type: 'physical',
+        description: 'Jollibee is the largest fast food chain in the Philippines, serving a wide variety of affordable and delicious meals including its famous Chickenjoy, Jolly Spaghetti, and Yumburger.',
+        images: ['Jollibee Store Front', 'Jollibee Interior'],
+        branches: [
+          {
+            location: 'Tibanga, Iligan City',
+            positions: [
+              { 
+                title: 'Service Crew', 
+                salary: '₱12,000 - ₱16,000', 
+                hiring: true, 
+                contact: '0917-555-1001',
+                description: 'Join our team as a Service Crew member. Responsibilities include taking orders, food preparation, and maintaining cleanliness.',
+                applicationLinks: [
+                  { name: 'Online Form', url: 'https://forms.gle/jollibee-service-crew' },
+                  { name: 'Email Resume', url: 'mailto:hr@jollibee-iligan.ph?subject=Service Crew Application' }
+                ]
+              },
+              { 
+                title: 'Cashier', 
+                salary: '₱11,000 - ₱15,000', 
+                hiring: true, 
+                contact: '0917-555-1002',
+                description: 'We are looking for Cashiers to handle customer transactions accurately and efficiently.',
+                applicationLinks: [
+                  { name: 'Online Form', url: 'https://forms.gle/jollibee-cashier' },
+                  { name: 'Email Resume', url: 'mailto:hr@jollibee-iligan.ph?subject=Cashier Application' }
+                ]
+              }
+            ]
+          },
+          {
+            location: 'Tubod, Iligan City',
+            positions: [
+              { 
+                title: 'Service Crew', 
+                salary: '₱12,000 - ₱16,000', 
+                hiring: true, 
+                contact: '0917-555-2001',
+                description: 'Join our team as a Service Crew member. Responsibilities include taking orders, food preparation, and maintaining cleanliness.',
+                applicationLinks: [
+                  { name: 'Online Form', url: 'https://forms.gle/jollibee-tubod' },
+                  { name: 'Email Resume', url: 'mailto:hr@jollibee-tubod.iligan.ph' }
+                ]
+              },
+              { 
+                title: 'Security Guard', 
+                salary: '₱11,000 - ₱14,000', 
+                hiring: false, 
+                contact: 'N/A',
+                description: 'Security personnel needed to ensure safety of premises and customers.',
+                applicationLinks: []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        id: 'mcdo',
+        name: 'McDonald\'s',
+        type: 'physical',
+        description: 'McDonald\'s is one of the world\'s largest fast food chains, known for its burgers, fries, and quick service. We provide excellent career opportunities with competitive benefits.',
+        images: ['McDonald\'s Store', 'McDonald\'s Team'],
+        branches: [
+          {
+            location: 'Poblacion, Iligan City',
+            positions: [
+              { 
+                title: 'Crew Member', 
+                salary: '₱12,500 - ₱16,500', 
+                hiring: true, 
+                contact: '0918-777-1001',
+                description: 'Crew Members are responsible for delivering great guest experiences in our restaurant.',
+                applicationLinks: [
+                  { name: 'Online Form', url: 'https://forms.gle/mcdonalds-crew' },
+                  { name: 'Career Portal', url: 'https://mcdonalds.ph/careers' }
+                ]
+              },
+              { 
+                title: 'Shift Manager', 
+                salary: '₱18,000 - ₱25,000', 
+                hiring: true, 
+                contact: '0918-777-1002',
+                description: 'Shift Managers help oversee restaurant operations during assigned shifts.',
+                applicationLinks: [
+                  { name: 'Online Form', url: 'https://forms.gle/mcdonalds-manager' },
+                  { name: 'Career Portal', url: 'https://mcdonalds.ph/careers' }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        id: 'chowking',
+        name: 'Chowking',
+        type: 'physical',
+        description: 'Chowking is the leading Chinese fast-food chain in the Philippines, offering delicious Chinese favorites like Chao Fan, dimsum, and noodles in a quick-service setting.',
+        images: ['Chowking Store', 'Chowking Food'],
+        branches: [
+          {
+            location: 'Poblacion, Iligan City',
+            positions: [
+              { 
+                title: 'Service Crew', 
+                salary: '₱11,500 - ₱15,500', 
+                hiring: true, 
+                contact: '0922-333-1001',
+                description: 'Service Crew members provide excellent customer service in our Chinese fast-food restaurant.',
+                applicationLinks: [
+                  { name: 'Online Form', url: 'https://forms.gle/chowking-application' },
+                  { name: 'Email Resume', url: 'mailto:careers@chowking-iligan.ph' }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        id: 'localmart',
+        name: 'LocalMart',
+        type: 'physical',
+        description: 'LocalMart is a leading retail chain in Iligan City, offering a wide range of products from groceries to household items. We provide excellent customer service and career growth opportunities.',
+        images: ['LocalMart Store', 'LocalMart Interior'],
+        branches: [
+          {
+            location: 'Poblacion, Iligan City',
+            positions: [
+              { 
+                title: 'Sales Associate', 
+                salary: '₱10,000 - ₱14,000', 
+                hiring: true, 
+                contact: '0928-111-2222',
+                description: 'Sales Associates assist customers, restock shelves, and maintain store appearance.',
+                applicationLinks: [
+                  { name: 'Online Form', url: 'https://forms.gle/localmart-sales' },
+                  { name: 'In-Person', url: '#' }
+                ]
+              },
+              { 
+                title: 'Cashier', 
+                salary: '₱10,500 - ₱14,500', 
+                hiring: false, 
+                contact: 'N/A',
+                description: 'Cashiers handle customer transactions and provide excellent service at checkout.',
+                applicationLinks: []
+              }
+            ]
+          }
+        ]
+      }
+    ];
+
+    const ONLINE_JOBS = [
+      {
+        id: 'online-1',
+        name: 'Virtual Assistant',
+        type: 'online',
+        description: 'Work from home as a Virtual Assistant handling administrative tasks, customer service, and social media management for international clients.',
+        images: ['Remote Work Setup', 'Virtual Meeting'],
+        positions: [
+          {
+            title: 'Virtual Assistant',
+            salary: '₱15,000 - ₱25,000',
+            hiring: true,
+            contact: 'online@jobligan.iligan.ph',
+            description: 'Provide administrative support to clients remotely, including email management, scheduling, and data entry.',
+            applicationLinks: [
+              { name: 'Apply Online', url: 'https://forms.gle/virtual-assistant' },
+              { name: 'Send Resume', url: 'mailto:va@jobligan.iligan.ph' }
+            ]
+          }
+        ]
+      }
+    ];
+
+    const companyCards = document.getElementById('companyCards');
+    const jobViewer = document.getElementById('jobViewer');
+    const resultsCount = document.getElementById('resultsCount');
+    const year = document.getElementById('year'); 
+    year.textContent = new Date().getFullYear();
+
+    // Set location to Iligan City only
+    document.getElementById('loc').value = 'Iligan City only';
+
+    let currentJobType = 'physical';
+
+    // Count total positions
+    function countTotalPositions(companyId = 'all') {
+      let count = 0;
+      const data = currentJobType === 'physical' ? JOB_DATA : ONLINE_JOBS;
+      const companiesToCount = companyId === 'all' 
+        ? data 
+        : data.filter(company => company.id === companyId);
+      
+      companiesToCount.forEach(company => {
+        if (company.branches) {
+          company.branches.forEach(branch => {
+            count += branch.positions.length;
+          });
+        } else if (company.positions) {
+          count += company.positions.length;
+        }
+      });
+      return count;
+    }
+
+    // Render company cards
+    function renderCompanyCards(companyId = 'all') {
+      companyCards.innerHTML = '';
+      let positionsCount = 0;
+      
+      const data = currentJobType === 'physical' ? JOB_DATA : ONLINE_JOBS;
+      const companiesToRender = companyId === 'all' 
+        ? data 
+        : data.filter(company => company.id === companyId);
+      
+      companiesToRender.forEach(company => {
+        positionsCount += countTotalPositions(company.id);
+        
+        const companyCard = document.createElement('div');
+        companyCard.className = 'company-card';
+        companyCard.dataset.company = company.id;
+        
+        let companyHTML = `
+          <div class="company-header">
+            <div class="company-logo">${company.name.charAt(0)}</div>
+            <div>
+              <div class="company-name">${company.name}</div>
+              <div class="company-branches">${currentJobType === 'physical' ? `${company.branches ? company.branches.length + ' branches in Iligan City' : 'Multiple positions available'}` : 'Remote Work'} • Click to view details</div>
+            </div>
+          </div>
+        `;
+        
+        if (currentJobType === 'physical' && company.branches) {
+          companyHTML += `<div class="branch-list" id="${company.id}-branches">`;
+          
+          company.branches.forEach(branch => {
+            companyHTML += `
+              <div class="branch-location">${branch.location}</div>
+            `;
+            
+            branch.positions.forEach(position => {
+              companyHTML += `
+                <div class="job">
+                  <div>
+                    <div style="font-weight:700">${position.title}</div>
+                    <div class="meta">${company.name} • <strong>${branch.location}</strong></div>
+                    <div class="tags">
+                      <span class="tag">${position.hiring ? 'Hiring' : 'Not Hiring'}</span>
+                      <span class="tag">${position.salary}</span>
+                    </div>
+                  </div>
+                  <div class="job-actions">
+                    <div class="salary">${position.salary}</div>
+                    <div class="small">${position.hiring ? 'Apply today' : 'Check back later'}</div>
+                    <div class="actions">
+                      <button class="btn save-btn">Save</button>
+                      <button class="btn ${position.hiring ? 'primary' : ''} view-job-btn" 
+                        data-job='${JSON.stringify({
+                          title: position.title,
+                          company: company.name,
+                          location: branch.location,
+                          salary: position.salary,
+                          hiring: position.hiring,
+                          contact: position.contact,
+                          description: position.description,
+                          applicationLinks: position.applicationLinks
+                        }).replace(/'/g, "&apos;")}'>
+                        ${position.hiring ? 'Apply Now' : 'Not Hiring'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              `;
+            });
+          });
+          companyHTML += `</div>`;
+        } else if (currentJobType === 'online' && company.positions) {
+          companyHTML += `<div class="branch-list" id="${company.id}-branches">`;
+          
+          company.positions.forEach(position => {
+            companyHTML += `
+              <div class="job">
+                <div>
+                  <div style="font-weight:700">${position.title}</div>
+                  <div class="meta">${company.name} • <strong>Remote Work</strong></div>
+                  <div class="tags">
+                    <span class="tag">${position.hiring ? 'Hiring' : 'Not Hiring'}</span>
+                    <span class="tag">${position.salary}</span>
+                    <span class="tag">Online</span>
+                  </div>
+                </div>
+                <div class="job-actions">
+                  <div class="salary">${position.salary}</div>
+                  <div class="small">${position.hiring ? 'Apply today' : 'Check back later'}</div>
+                  <div class="actions">
+                    <button class="btn save-btn">Save</button>
+                    <button class="btn ${position.hiring ? 'primary' : ''} view-job-btn" 
+                      data-job='${JSON.stringify({
+                        title: position.title,
+                        company: company.name,
+                        location: 'Remote (Iligan Based)',
+                        salary: position.salary,
+                        hiring: position.hiring,
+                        contact: position.contact,
+                        description: position.description,
+                        applicationLinks: position.applicationLinks
+                      }).replace(/'/g, "&apos;")}'>
+                      ${position.hiring ? 'Apply Now' : 'Not Hiring'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            `;
+          });
+          companyHTML += `</div>`;
+        }
+        
+        companyCard.innerHTML = companyHTML;
+        companyCards.appendChild(companyCard);
+      });
+      
+      // Update results count
+      resultsCount.textContent = `${positionsCount} job positions`;
+      
+      // Add event listeners to company cards
+      document.querySelectorAll('.company-card').forEach(card => {
+        card.addEventListener('click', function(e) {
+          // Don't trigger if clicking on a button inside the card
+          if (!e.target.classList.contains('btn')) {
+            // Remove active class from all cards
+            document.querySelectorAll('.company-card').forEach(c => {
+              c.classList.remove('active');
+            });
+            
+            // Add active class to clicked card
+            this.classList.add('active');
+            
+            const companyId = this.dataset.company;
+            const data = currentJobType === 'physical' ? JOB_DATA : ONLINE_JOBS;
+            const company = data.find(c => c.id === companyId);
+            
+            if (company) {
+              renderCompanyViewer(company);
+            }
+            
+            // Toggle branch list for physical jobs
+            if (currentJobType === 'physical') {
+              const branchList = this.querySelector('.branch-list');
+              if (branchList) {
+                branchList.classList.toggle('active');
+              }
+            }
+          }
+        });
+      });
+      
+      // Add event listeners to apply buttons
+      document.querySelectorAll('.view-job-btn:not(:disabled)').forEach(button => {
+        button.addEventListener('click', function(e) {
+          e.stopPropagation(); // Prevent triggering the company card click
+          const jobData = JSON.parse(this.dataset.job.replace(/&apos;/g, "'"));
+          renderJobViewer(jobData);
+        });
+      });
+    }
+
+    // Render company viewer with company details
+    function renderCompanyViewer(company) {
+      // Create circular images
+      let imagesHTML = '';
+      if (company.images && company.images.length > 0) {
+        imagesHTML = '<div class="image-gallery">';
+        company.images.forEach((image, index) => {
+          imagesHTML += `
+            <div class="circle-image">
+              ${image}
+            </div>
+          `;
+        });
+        // Add empty circles if we have less than 2 images
+        for (let i = company.images.length; i < 2; i++) {
+          imagesHTML += `
+            <div class="circle-image">
+              Image ${i+1}
+            </div>
+          `;
+        }
+        imagesHTML += '</div>';
+      }
+      
+      jobViewer.innerHTML = `
+        <div style="margin-bottom:16px">
+          <div style="font-weight:700; font-size:18px">${company.name}</div>
+          <div style="color:var(--muted); margin-top:4px">${currentJobType === 'physical' ? 'Physical Locations in Iligan City' : 'Online/Remote Work'}</div>
+        </div>
+        
+        ${imagesHTML}
+        
+        <div style="margin: 16px 0;">
+          <h4 style="margin-bottom: 8px;">About ${company.name}</h4>
+          <p style="color: var(--muted); font-size: 14px;">${company.description}</p>
+        </div>
+        
+        <div class="contact">
+          <div><strong>Job Type:</strong> ${currentJobType === 'physical' ? 'Face to Face' : 'Remote/Online'}</div>
+          <div><strong>Locations:</strong> ${currentJobType === 'physical' ? (company.branches ? company.branches.length + ' branches in Iligan City' : 'Multiple locations') : 'Work from Home'}</div>
+        </div>
+        
+        <div style="margin-top: 20px;">
+          <h4 style="margin-bottom: 12px;">Available Positions</h4>
+          <p style="color: var(--muted); font-size: 14px;">Click on any position to view details and apply</p>
+        </div>
+      `;
+    }
+
+    // Render job viewer with selected job
+    function renderJobViewer(job) {
+      // Create application links
+      let applicationLinksHTML = '';
+      if (job.hiring && job.applicationLinks && job.applicationLinks.length > 0) {
+        applicationLinksHTML = '<div class="application-links">';
+        job.applicationLinks.forEach(link => {
+          applicationLinksHTML += `
+            <a href="${link.url}" class="application-link" target="_blank">${link.name}</a>
+          `;
+        });
+        applicationLinksHTML += '</div>';
+      } else if (!job.hiring) {
+        applicationLinksHTML = '<p style="color:var(--muted); text-align:center">This position is not currently hiring. Please check back later.</p>';
+      }
+      
+      jobViewer.innerHTML = `
+        <div style="margin-bottom:16px">
+          <div style="font-weight:700; font-size:18px">${job.title}</div>
+          <div style="color:var(--muted); margin-top:4px">${job.company} • ${job.location}</div>
+          <div style="font-weight:600; color:var(--accent); margin-top:8px">${job.salary}</div>
+        </div>
+        
+        <div style="margin: 16px 0;">
+          <h4 style="margin-bottom: 8px;">Job Description</h4>
+          <p style="color: var(--muted); font-size: 14px;">${job.description}</p>
+        </div>
+        
+        <div class="contact">
+          <div><strong>Location:</strong> ${job.location}</div>
+          <div><strong>Contact:</strong> ${job.contact}</div>
+          <div><strong>Status:</strong> ${job.hiring ? 'Now Hiring' : 'Not Hiring'}</div>
+        </div>
+        
+        <div style="margin-top: 20px;">
+          <h4 style="margin-bottom: 12px; text-align: center;">Apply for this Position</h4>
+          ${applicationLinksHTML}
+        </div>
+      `;
+    }
+
+    // Category filtering
+    document.querySelectorAll('.category-btn').forEach(button => {
+      button.addEventListener('click', function() {
+        // Remove active class from all buttons
+        document.querySelectorAll('.category-btn').forEach(btn => {
+          btn.classList.remove('active');
+        });
+        
+        // Add active class to clicked button
+        this.classList.add('active');
+        
+        const category = this.dataset.category;
+        renderCompanyCards(category);
+      });
+    });
+
+    // Job type switching
+    document.querySelectorAll('.job-type-tab').forEach(button => {
+      button.addEventListener('click', function() {
+        // Remove active class from all buttons
+        document.querySelectorAll('.job-type-tab').forEach(btn => {
+          btn.classList.remove('active');
+        });
+        
+        // Add active class to clicked button
+        this.classList.add('active');
+        
+        currentJobType = this.dataset.type;
+        renderCompanyCards();
+        
+        // Update title based on job type
+        const title = document.querySelector('.title');
+        const subtitle = document.querySelector('.subtitle');
+        const mainTitle = document.querySelector('main h2');
+        
+        if (currentJobType === 'physical') {
+          title.textContent = 'Find physical jobs in Iligan City — exclusive local opportunities';
+          subtitle.textContent = 'Browse verified job listings from employers across Iligan City.';
+          mainTitle.textContent = 'Physical Jobs by Company';
+        } else {
+          title.textContent = 'Find online jobs — work from Iligan City';
+          subtitle.textContent = 'Browse remote job opportunities available for Iligan City residents.';
+          mainTitle.textContent = 'Online Jobs';
+        }
+      });
+    });
+
+    // Save button functionality
+    document.addEventListener('click', function(e) {
+      if (e.target.classList.contains('save-btn')) {
+        e.target.textContent = 'Saved';
+        e.target.style.background = 'var(--accent)';
+        e.target.style.color = 'white';
+        // In a real app, you would save this to localStorage or send to a server
+      }
+    });
+
+    // initial render
+    renderCompanyCards();
+
+    // basic filtering (client-side)
+    document.getElementById('searchBtn').addEventListener('click', ()=>{
+      const q = (document.getElementById('q').value||'').toLowerCase();
+      const cat = document.getElementById('category').value;
+      const hiringOnly = document.getElementById('hiringOnly').checked;
+
+      // This is a simplified search - in a real app you would implement more robust search
+      if (q.trim() === '' && cat === 'All Categories' && !hiringOnly) {
+        renderCompanyCards();
+      } else {
+        alert('Search functionality would filter jobs based on your criteria in a full implementation.');
+      }
+    });
+
+    // allow pressing Enter in inputs to trigger search
+    document.getElementById('q').addEventListener('keypress', (e)=>{ 
+      if(e.key==='Enter') document.getElementById('searchBtn').click() 
+    });
+  </script>
+</body>
+</html>
